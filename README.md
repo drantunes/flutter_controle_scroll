@@ -9,5 +9,3 @@ Também, quando o usuário rolar a tela, adicionar um `listener` para alterar au
 ## Package alternativo
 
 - [Scrollable Positioned List](https://pub.dev/packages/scrollable_positioned_list)
-
-![Exemplo da Lista Gerada](screen.png)
