@@ -11,6 +11,40 @@ class RestauranteDetalhes extends StatefulWidget {
 
 class _RestauranteDetalhesState extends State<RestauranteDetalhes> {
   final List<GlobalKey> categorias = [GlobalKey(), GlobalKey(), GlobalKey()];
+  late ScrollController scrollCont;
+  BuildContext? tabContext;
+
+  @override
+  void initState() {
+    scrollCont = ScrollController();
+    scrollCont.addListener(changeTabs);
+    super.initState();
+  }
+
+  changeTabs() {
+    late RenderBox box;
+
+    for (var i = 0; i < categorias.length; i++) {
+      box = categorias[i].currentContext!.findRenderObject() as RenderBox;
+      Offset position = box.localToGlobal(Offset.zero);
+
+      if (scrollCont.offset >= position.dy)
+        DefaultTabController.of(tabContext!)!.animateTo(
+          i,
+          duration: Duration(milliseconds: 100),
+        );
+    }
+  }
+
+  scrollTo(int index) async {
+    scrollCont.removeListener(changeTabs);
+    final categoria = categorias[index].currentContext!;
+    await Scrollable.ensureVisible(
+      categoria,
+      duration: Duration(milliseconds: 600),
+    );
+    scrollCont.addListener(changeTabs);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +52,7 @@ class _RestauranteDetalhesState extends State<RestauranteDetalhes> {
       length: 3,
       child: Builder(
         builder: (BuildContext context) {
-          // tabContext = context;
+          tabContext = context;
           return Scaffold(
             appBar: AppBar(
               leading: BackButton(color: Colors.red),
@@ -50,12 +84,11 @@ class _RestauranteDetalhesState extends State<RestauranteDetalhes> {
                   Tab(child: Text('Burgers')),
                   Tab(child: Text('Combos')),
                 ],
-                onTap: (int index) => print('scroll p/ categoria'),
-                //scrollTo(index),
+                onTap: (int index) => scrollTo(index),
               ),
             ),
             body: SingleChildScrollView(
-              // controller: scrollCont,
+              controller: scrollCont,
               child: Column(
                 children: [
                   categoriaComida('Carnes', 0),
